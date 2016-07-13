@@ -32,6 +32,8 @@ typelist = []
 ingrset= [set() for i in range(1,21)]
 ingrcompare = [[] for i in range(1,21)]
 ingrcounter = [0 for i in range(1,21)]
+normalize_switch = False
+# if normalize_switch is false, then output comparison; otherwise, output normalized list without duplicates.
 
 files = [open('IngrType%i.csv' %i, 'w', encoding='utf-8-sig') for i in range(1,21)]
 #for f in files:
@@ -91,32 +93,36 @@ with open('lstProducts.csv',encoding='utf-8-sig') as csvfile:
                                 #ingrset[fileindex].add(ingrlinn)               
         except OSError as e:
             pass
-#==============================================================================
-#     for s in ingrset:
-#         outputlist = list(s)
-#         fileindex = ingrset.index(s)
-#         typewriter = csv.writer(files[fileindex], quoting = csv.QUOTE_NONE, quotechar = '')
-#         for ing in sorted(outputlist):
-#             try:
-#                 typewriter.writerow([ing])
-#             except csv.Error as e:
-#                 print(ing)
-#                 continue
-#==============================================================================
-    for t in ingrcompare:
-        fileindex = ingrcompare.index(t)
-        typewriter = csv.writer(files[fileindex], quoting = csv.QUOTE_MINIMAL, quotechar = '|')
-        typewriter.writerow(["Original Name"]+["Processed Name"])
-        for inggroup in t:
-            try:
-                typewriter.writerow([inggroup[0]]+[inggroup[1]])
-            except csv.Error as e:
-                print(inggroup[0],inggroup[1])
-                continue
+    if normalize_switch:
+        for s in ingrset:
+            outputlist = list(s)
+            fileindex = ingrset.index(s)
+            typewriter = csv.writer(files[fileindex], quoting = csv.QUOTE_NONE, quotechar = '')
+            for ing in sorted(outputlist):
+                try:
+                    typewriter.writerow([ing])
+                except csv.Error as e:
+                    print(ing)
+                    continue
+             
+    else:         
+        for t in ingrcompare:
+            fileindex = ingrcompare.index(t)
+            typewriter = csv.writer(files[fileindex], quoting = csv.QUOTE_MINIMAL, quotechar = '|')
+            typewriter.writerow(["Original Name"]+["Processed Name"])
+            for inggroup in t:
+                try:
+                    typewriter.writerow([inggroup[0]]+[inggroup[1]])
+                except csv.Error as e:
+                    print(inggroup[0],inggroup[1])
+                    continue
             
     for f in files:
         f.close()
         fileindex = files.index(f)
-        newname = typelist[fileindex] + '_new.txt'
+        if not normalize_switch:
+            newname = typelist[fileindex] + '_new.txt'
+        else:
+            newname = typelist[fileindex]
         os.rename(f.name,newname)    
         
